@@ -1,0 +1,20 @@
+fastapi
+uvicorn[standard]
+
+pymupdf
+pillow
+numpy
+opencv-python-headless
+
+qrcode
+python-barcode
+
+python-multipart
+
+# Optional but recommended (used implicitly in async/threading)
+anyio
+
+# If your auth system depends on it (very likely)
+python-jose
+passlib[bcrypt]
+jwt
