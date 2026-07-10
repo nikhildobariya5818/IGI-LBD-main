@@ -93,8 +93,14 @@ export default function LBDReportsSection() {
         clientName: clientName.trim(),
       } as IGIReportData
 
-      // Generate PDF with 14x8.5 inches fixed size
-      const blob = await pdf(<IGIReportPDF data={mergedData} />).toBlob()
+      // Generate PDF with 14x8.5 inches fixed size and background image
+      const blob = await pdf(
+        <IGIReportPDF 
+          data={mergedData} 
+          clientName={clientName.trim()}
+          backgroundImage="/images/igi-report-template.jpg"
+        />
+      ).toBlob()
 
       setLoadingProgress(95)
 
