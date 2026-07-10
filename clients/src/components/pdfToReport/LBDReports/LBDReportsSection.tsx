@@ -93,6 +93,14 @@ export default function LBDReportsSection() {
         clientName: clientName.trim(),
       } as IGIReportData
 
+      console.log("[v0] Merged Report Data:", mergedData)
+      console.log("[v0] Images in data:", {
+        clarity_characteristics_full: mergedData?.clarity_characteristics_full,
+        color_clarity_chart_full: mergedData?.color_clarity_chart_full,
+        qrcode_image: mergedData?.qrcode_image,
+        PROPORTIONS: mergedData?.PROPORTIONS,
+      })
+
       // Generate PDF with 14x8.5 inches fixed size and background image
       const blob = await pdf(
         <IGIReportPDF 

@@ -40,24 +40,26 @@ const styles = StyleSheet.create({
 
 export default function LBDReportPDFSection5({ data }: any) {
   const report = data.GIANATURALDIAMONDGRADINGREPORT || {};
+  const qrSrc = data?.qrcode_image || data?.Images?.qrcode_image;
+  const proportionsSrc = data?.PROPORTIONS || data?.Images?.PROPORTIONS;
 
   return (
     <View style={styles.container}>
-      {/* QR Code */}
-      {data.qrcode_image && (
+      {/* QR Code - only render if valid image source */}
+      {qrSrc && typeof qrSrc === 'string' && (
         <View style={styles.qrContainer}>
           <Image
-            src={data.qrcode_image}
+            src={qrSrc}
             style={styles.qrImage}
           />
         </View>
       )}
 
-      {/* Proportions Diagram */}
-      {data.PROPORTIONS && (
+      {/* Proportions Diagram - only render if valid image source */}
+      {proportionsSrc && typeof proportionsSrc === 'string' && (
         <View style={styles.proportionsContainer}>
           <Image
-            src={data.PROPORTIONS}
+            src={proportionsSrc}
             style={styles.proportionsImage}
           />
         </View>

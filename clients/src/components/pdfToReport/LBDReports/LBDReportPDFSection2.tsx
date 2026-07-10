@@ -22,14 +22,23 @@ const styles = StyleSheet.create({
 });
 
 export default function LBDReportPDFSection2({ data }: any) {
+  const imageSrc = data?.clarity_characteristics_full || data?.Images?.clarity_characteristics_full;
+  
+  // Only render if image source exists and is a valid string
+  if (!imageSrc || typeof imageSrc !== 'string') {
+    return (
+      <View style={styles.imageWrapper}>
+        <View />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.imageWrapper}>
-      {data.clarity_characteristics_full && (
-        <Image
-          src={data.clarity_characteristics_full}
-          style={styles.clarityImage}
-        />
-      )}
+      <Image
+        src={imageSrc}
+        style={styles.clarityImage}
+      />
     </View>
   );
 }
