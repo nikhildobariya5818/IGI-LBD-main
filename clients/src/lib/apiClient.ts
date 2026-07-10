@@ -160,6 +160,50 @@ export const apiClient = {
     }
   },
 
+  // ✅ IGI report upload
+  uploadIGIReport: async <T = unknown>(
+    file: File,
+    opts?: {
+      token?: string;
+      clientName?: string;
+      onUploadProgress?: (progressEvent: AxiosProgressEvent) => void;
+    }
+  ): Promise<T> => {
+    try {
+      const axios = createAxiosClient({ token: opts?.token });
+      const form = new FormData();
+
+      form.append("file", file);
+
+      if (opts?.clientName) {
+        form.append("clientName", opts.clientName);
+      }
+
+      const res = await axios.post<ApiResponse<T>>(
+        "/extract-igi-report",
+        form,
+        {
+          onUploadProgress: opts?.onUploadProgress,
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (res.data?.success === false) {
+        throw new ApiError(
+          res.data?.error || "IGI report extraction failed",
+          400,
+          res.data
+        );
+      }
+
+      return (res.data?.data ?? res.data) as T;
+    } catch (err) {
+      handleAxiosError(err);
+    }
+  },
+
   // 🚧 Not implemented
   exportBackup: async (): Promise<{ blob: Blob; filename?: string }> => {
     throw new ApiError("Export backup not implemented", 501);
