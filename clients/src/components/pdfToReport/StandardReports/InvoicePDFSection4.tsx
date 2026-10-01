@@ -13,7 +13,7 @@ const getClarityImageStyles = (shapeType: string) => {
     const shape = shapeType?.toLowerCase();
 
     const baseContainer = {
-        display: "flex",
+        display: "flex" as const,
         flexDirection: "row" as const,
         alignItems: "center" as const,
         justifyContent: "center" as const,

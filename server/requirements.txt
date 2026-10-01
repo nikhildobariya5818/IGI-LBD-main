@@ -18,3 +18,4 @@ anyio
 python-jose
 passlib[bcrypt]
 jwt
+pdf2image

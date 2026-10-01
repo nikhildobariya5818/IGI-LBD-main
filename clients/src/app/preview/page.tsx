@@ -1,19 +1,23 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { PDFViewer } from "@react-pdf/renderer";
-import sampleData from "@/data/sampleData";
-import InvoicePDF from "@/components/pdfToReport/StandardReports/InvoicePDF";
+import IGIReportPDF from "@/components/pdfToReport/LBDReports/IGIReportPDF";
+import type { LBDImageReportData } from "@/components/pdfToReport/LBDReports/IGIReportContent";
 
-const PreviewPage = () => {
-    return (
-        <div style={{ width: "100vw", height: "100vh" }}>
-            <PDFViewer style={{ width: "100%", height: "100%" }}>
-                <InvoicePDF data={sampleData} />
-            </PDFViewer>
-        </div>
-    );
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+
+const lbdSampleData: LBDImageReportData = {
+  page_width: 4200,
+  page_height: 2550,
+  cache_bust: Date.now(),
+  image_urls: {
+    page2: `${API_BASE_URL}/output/page2.png`,
+    page3: `${API_BASE_URL}/output/page3.png`,
+  },
 };
 
-// Prevent SSR – PDFViewer must run only in browser
-export default dynamic(() => Promise.resolve(PreviewPage), { ssr: false });
+const LBDPreviewPage = () => {
+  return <IGIReportPDF data={lbdSampleData} backgroundImage="/igi-report-template.jpg" />;
+};
+
+export default dynamic(() => Promise.resolve(LBDPreviewPage), { ssr: false });

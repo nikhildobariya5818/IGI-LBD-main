@@ -1,22 +1,23 @@
 @echo off
+title Start GIA Reports
 
-echo Starting FastAPI backend on http://localhost:8000...
-cd server
+REM Go to the project root (where this .bat file is)
+cd /d "%~dp0"
 
-REM Activate virtual environment
-call .venv\Scripts\activate
+echo Starting FastAPI Backend...
+start "FastAPI Backend" cmd /k "uvicorn main:app --reload --host 0.0.0.0 --port 8000"
 
-REM Start backend in a new window (with venv)
-start "FastAPI Backend" cmd /k "call .venv\Scripts\activate && uvicorn main:app --reload --host 0.0.0.0 --port 8000"
-
-REM Wait a bit for backend to boot
+REM Wait a few seconds
 timeout /t 3 >nul
 
-echo Starting Next.js frontend on http://localhost:3000...
-cd ..\clients
+echo Starting Next.js Frontend...
+cd /d "%~dp0clients"
 
-REM Start frontend
-start "Next.js Frontend" cmd /k npm run start
+start "Next.js Frontend" cmd /k "npm run start"
 
-echo Both servers started!
+echo.
+echo ==========================================
+echo Backend : http://localhost:8000
+echo Frontend: http://localhost:3000
+echo ==========================================
 pause

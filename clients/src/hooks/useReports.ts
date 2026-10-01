@@ -63,3 +63,14 @@ export function useImportBackup(options?: {
     },
   })
 }
+
+export function useUploadIGIReport() {
+  const qc = useQueryClient()
+  return useMutation<any, Error, { file: File; clientName?: string; onUploadProgress?: (e: any) => void }>({
+    mutationFn: ({ file, clientName, onUploadProgress }) =>
+      apiClient.uploadIGIReport(file, { clientName, onUploadProgress }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.reports.all() })
+    },
+  })
+}

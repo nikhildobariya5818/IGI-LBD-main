@@ -13,6 +13,7 @@ import InvoicePDFGradingScales from "./StandardReports/InvoicePDF-GradingScales"
 import { useUploadPdf } from "../../hooks/useReports"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import MiniReportsSection from "./MiniReports/MiniReportsSection"
+import LBDReportsSection from "./LBDReports/LBDReportsSection"
 
 interface ProportionData {
   TBL: string
@@ -40,7 +41,7 @@ const ReportProcessor = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [pdfSize, setPdfSize] = useState<"17x11" | "14x8.5">("17x11")
-  const [activeTab, setActiveTab] = useState<"standard" | "mini">("standard")
+  const [activeTab, setActiveTab] = useState<"standard" | "mini" | "lbd">("standard")
   const [useGradingScales, setUseGradingScales] = useState(false)
   const [editReport, setEditReport] = useState(false)
 
@@ -216,6 +217,16 @@ const ReportProcessor = () => {
           >
             Mini Reports
           </button>
+          <button
+            onClick={() => setActiveTab("lbd")}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === "lbd"
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            LBD Diamonds Report
+          </button>
         </div>
 
         {activeTab === "standard" && (
@@ -358,6 +369,8 @@ const ReportProcessor = () => {
         )}
 
         {activeTab === "mini" && <MiniReportsSection />}
+
+        {activeTab === "lbd" && <LBDReportsSection />}
       </div>
     </div>
   )
