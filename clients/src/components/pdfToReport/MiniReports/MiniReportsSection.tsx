@@ -14,6 +14,7 @@ import { Label } from "../../ui/label"
 import { Input } from "../../ui/input"
 import { apiClient } from "../../../lib/apiClient"
 import { generateMiniReportFileName } from "./utils/miniReportFileName"
+import ReportIntensityButtons, { reportOpacity, type ReportIntensity } from "../ReportIntensityButtons"
 
 interface ReportData {
   ReportNumber: string
@@ -107,7 +108,11 @@ export default function MiniReportsSection() {
     }))
   }
 
-  const handleProcessPdfs = async (files: File[], mode: "single" | "dual" = "single") => {
+  const handleProcessPdfs = async (
+    files: File[],
+    mode: "single" | "dual" = "single",
+    intensity: ReportIntensity = 100,
+  ) => {
     setIsLoading(true)
     setLoadingStatus("uploading")
     setLoadingProgress(20)
@@ -140,10 +145,10 @@ export default function MiniReportsSection() {
 
         const reportsArray = selectedPosition === "top" ? [singleReport, null] : [null, singleReport]
         setFetchedReports([singleReport])
-        await generatePDF(reportsArray)
+        await generatePDF(reportsArray, intensity)
       } else if (mode === "dual" && files.length === 2) {
         setFetchedReports(reports)
-        await generatePDF(reports)
+        await generatePDF(reports, intensity)
       }
 
       setShowPositionDialog(false)
@@ -159,7 +164,7 @@ export default function MiniReportsSection() {
     }
   }
 
-  const generatePDF = async (reports: (ReportData | null)[]) => {
+  const generatePDF = async (reports: (ReportData | null)[], intensity: ReportIntensity = 100) => {
     setIsGenerating(true)
     setLoadingStatus("generating")
     setLoadingProgress(70)
@@ -167,7 +172,9 @@ export default function MiniReportsSection() {
     try {
       const reportsWithLocation = reports.map((report) => (report ? { ...report, ...locationData } : null))
 
-      const blob = await pdf(<InvoicePDFMini reports={reportsWithLocation} />).toBlob()
+      const blob = await pdf(
+        <InvoicePDFMini reports={reportsWithLocation} reportOpacity={reportOpacity(intensity)} />,
+      ).toBlob()
       setLoadingProgress(90)
 
       const url = URL.createObjectURL(blob)
@@ -201,9 +208,9 @@ export default function MiniReportsSection() {
     }
   }
 
-  const handlePositionSubmit = () => {
+  const handlePositionSubmit = (intensity: ReportIntensity = 100) => {
     if (uploadedFiles.length === 1) {
-      handleProcessPdfs(uploadedFiles, "single")
+      handleProcessPdfs(uploadedFiles, "single", intensity)
     }
   }
 
@@ -405,9 +412,11 @@ export default function MiniReportsSection() {
               </Button>
             </div>
 
-            <Button onClick={handlePositionSubmit} disabled={isLoading || isGenerating} className="w-full">
-              {isLoading || isGenerating ? "Processing..." : "Generate PDF"}
-            </Button>
+            <ReportIntensityButtons
+              onSelect={handlePositionSubmit}
+              disabled={isLoading || isGenerating}
+              label="Choose report submission strength"
+            />
           </div>
         </DialogContent>
       </Dialog>

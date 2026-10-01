@@ -14,6 +14,7 @@ import { useUploadPdf } from "../../hooks/useReports"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import MiniReportsSection from "./MiniReports/MiniReportsSection"
 import LBDReportsSection from "./LBDReports/LBDReportsSection"
+import ReportIntensityButtons, { reportOpacity, type ReportIntensity } from "./ReportIntensityButtons"
 
 interface ProportionData {
   TBL: string
@@ -91,7 +92,7 @@ const ReportProcessor = () => {
     return true
   }
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent, intensity: ReportIntensity = 100) => {
     event.preventDefault()
     if (!validateForm()) return
     setIsLoading(true)
@@ -135,7 +136,9 @@ const ReportProcessor = () => {
 
       // For direct download, use grading scales if selected
       const PDFComponent = useGradingScales ? InvoicePDFGradingScales : InvoicePDF
-      const blob = await pdf(<PDFComponent data={mergedData} size={pdfSize} />).toBlob()
+      const blob = await pdf(
+        <PDFComponent data={mergedData} size={pdfSize} reportOpacity={reportOpacity(intensity)} />,
+      ).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
@@ -359,9 +362,10 @@ const ReportProcessor = () => {
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Processing..." : "Submit Report"}
-                  </Button>
+                  <ReportIntensityButtons
+                    onSelect={(intensity) => void handleSubmit({ preventDefault: () => undefined } as React.FormEvent, intensity)}
+                    disabled={isLoading}
+                  />
                 </form>
               </CardContent>
             </Card>

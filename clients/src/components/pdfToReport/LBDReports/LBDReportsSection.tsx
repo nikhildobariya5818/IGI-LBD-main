@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Upload } from "lucide-react"
 import { pdf } from "@react-pdf/renderer"
 import IGIReportContent from "./IGIReportContent"
+import ReportIntensityButtons, { reportOpacity, type ReportIntensity } from "../ReportIntensityButtons"
 import { toast } from "sonner"
 import { Label } from "../../ui/label"
 import { Input } from "../../ui/input"
@@ -64,7 +65,7 @@ export default function LBDReportsSection() {
     }
   }
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent, intensity: ReportIntensity = 100) => {
     event.preventDefault()
 
     if (!uploadedFile) {
@@ -165,8 +166,9 @@ export default function LBDReportsSection() {
       const blob = await pdf(
         <IGIReportContent
           data={mergedData}
-          backgroundImage="/igi-report-template.jpg"
-        />
+  backgroundImage="/igi-report-template.jpg"
+    reportOpacity={reportOpacity(intensity)}
+  />
       ).toBlob()
 
       setLoadingProgress(95)
@@ -303,13 +305,10 @@ export default function LBDReportsSection() {
             </div>
 
             {/* Submit Button */}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={!isFormComplete || isLoading}
-            >
-              {isLoading ? "Processing..." : "Generate IGI Report"}
-            </Button>
+      <ReportIntensityButtons
+        onSelect={(intensity) => void handleSubmit({ preventDefault: () => undefined } as React.FormEvent, intensity)}
+        disabled={!isFormComplete || isLoading}
+      />
           </form>
 
           {!isFormComplete && (

@@ -96,12 +96,14 @@ export default function InvoicePDF({
   offsets,
   layout,
   activeSection,
+  reportOpacity = 1,
 }: {
   data: any
   size?: "17x11" | "14x8.5"
   offsets?: { [key: string]: { x: number; y: number } }
   layout?: PDFLayout
   activeSection?: SectionType
+  reportOpacity?: number
 }) {
   const isSmall = size === "14x8.5"
 
@@ -206,7 +208,7 @@ export default function InvoicePDF({
     <Document>
       <Page
         size={[dimensions.width, dimensions.height]}
-        style={{ ...styles.page, width: dimensions.width, height: dimensions.height }}
+        style={{ ...styles.page, width: dimensions.width, height: dimensions.height, opacity: reportOpacity }}
       >
         {/* ✅ Dynamic background image */}
         {/* <Image src={backgroundImageSrc} style={styles.backgroundImage} /> */}
