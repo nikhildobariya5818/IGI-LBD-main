@@ -49,9 +49,11 @@ export interface LBDImageReportData {
 export default function IGIReportContent({
   data,
   backgroundImage,
+  opacity = 1,
 }: {
   data: LBDImageReportData
   backgroundImage?: string
+  opacity?: number
 }) {
   const pageWidth = LBD_PDF_PAGE_WIDTH
   const pageHeight = LBD_PDF_PAGE_HEIGHT
@@ -70,7 +72,7 @@ export default function IGIReportContent({
 
   return (
     <Document>
-      <Page size={[pageWidth, pageHeight]} style={styles.page}>
+      <Page size={[pageWidth, pageHeight]} style={[styles.page, { opacity }]}>
         {/* {backgroundImage ? <Image src={backgroundImage} style={styles.backgroundImage} /> : null} */}
         {PANELS.map((panel) => {
           const panelStyle = { left: pageWidth * panel.left, width: pageWidth * panel.width }

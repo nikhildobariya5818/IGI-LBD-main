@@ -61,6 +61,14 @@ interface UploadMiniReportsResponse {
 
 export default function MiniReportsSection() {
   const [pdfName, setPdfName] = useState("")
+  const [submitOpacity, setSubmitOpacity] = useState(1)
+
+  const submitOptions = [
+    { label: "25%", opacity: 0.25 },
+    { label: "50%", opacity: 0.5 },
+    { label: "75%", opacity: 0.75 },
+    { label: "100%", opacity: 1 },
+  ]
   const [isGenerating, setIsGenerating] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -167,7 +175,7 @@ export default function MiniReportsSection() {
     try {
       const reportsWithLocation = reports.map((report) => (report ? { ...report, ...locationData } : null))
 
-      const blob = await pdf(<InvoicePDFMini reports={reportsWithLocation} />).toBlob()
+      const blob = await pdf(<InvoicePDFMini reports={reportsWithLocation} opacity={submitOpacity} />).toBlob()
       setLoadingProgress(90)
 
       const url = URL.createObjectURL(blob)
@@ -253,7 +261,18 @@ export default function MiniReportsSection() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+          <CardContent className="space-y-4">
+            <div className="space-y-2 rounded-lg border border-border bg-accent/30 p-4">
+              <p className="text-sm font-medium">Submit report intensity</p>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {submitOptions.map((option) => (
+                  <Button key={option.label} type="button" variant={submitOpacity === option.opacity ? "default" : "outline"} onClick={() => setSubmitOpacity(option.opacity)} disabled={isLoading || isGenerating}>
+                    Submit Report {option.label}
+                  </Button>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">100% keeps the original appearance.</p>
+            </div>
           <div className="space-y-4 p-4 bg-accent/30 rounded-lg border border-border">
             <h3 className="font-semibold text-sm">Location Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

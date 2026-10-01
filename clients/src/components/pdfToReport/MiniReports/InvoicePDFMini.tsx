@@ -43,14 +43,14 @@ const styles = StyleSheet.create({
   },
 })
 
-export default function InvoicePDFMini({ reports }: { reports?: any[] }) {
+export default function InvoicePDFMini({ reports, opacity = 1 }: { reports?: any[]; opacity?: number }) {
   const reportData = reports || sampleDatamini.reports.slice(0, 2)
 
   const finalReports = [reportData[0] || null, reportData[1] || null]
 
   return (
     <Document>
-      <Page size={[PAGE_WIDTH, PAGE_HEIGHT]} style={styles.page}>
+      <Page size={[PAGE_WIDTH, PAGE_HEIGHT]} style={[styles.page, { opacity } ]}>
         {/* Background */}
         
 

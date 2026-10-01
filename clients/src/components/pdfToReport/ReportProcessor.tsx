@@ -44,6 +44,14 @@ const ReportProcessor = () => {
   const [activeTab, setActiveTab] = useState<"standard" | "mini" | "lbd">("standard")
   const [useGradingScales, setUseGradingScales] = useState(false)
   const [editReport, setEditReport] = useState(false)
+  const [submitOpacity, setSubmitOpacity] = useState(1)
+
+  const submitOptions = [
+    { label: "25%", opacity: 0.25 },
+    { label: "50%", opacity: 0.5 },
+    { label: "75%", opacity: 0.75 },
+    { label: "100%", opacity: 1 },
+  ]
 
   const [proportions, setProportions] = useState<ProportionData>({
     TBL: "",
@@ -129,13 +137,13 @@ const ReportProcessor = () => {
       if (editReport) {
         const encodedData = encodeURIComponent(JSON.stringify(mergedData))
         const pdfName = proportions.pdfname || ''
-        window.location.href = `/editor?data=${encodedData}&size=${encodeURIComponent(pdfSize)}&pdfName=${encodeURIComponent(pdfName)}&fileName=${encodeURIComponent(fileName)}&useGradingScales=${useGradingScales}`
+        window.location.href = `/editor?data=${encodedData}&size=${encodeURIComponent(pdfSize)}&pdfName=${encodeURIComponent(pdfName)}&fileName=${encodeURIComponent(fileName)}&useGradingScales=${useGradingScales}&opacity=${submitOpacity}`
         return
       }
 
       // For direct download, use grading scales if selected
       const PDFComponent = useGradingScales ? InvoicePDFGradingScales : InvoicePDF
-      const blob = await pdf(<PDFComponent data={mergedData} size={pdfSize} />).toBlob()
+      const blob = await pdf(<PDFComponent data={mergedData} size={pdfSize} opacity={submitOpacity} />).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
@@ -359,8 +367,22 @@ const ReportProcessor = () => {
                     </div>
                   </div>
 
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {submitOptions.map((option) => (
+                      <Button
+                        key={option.label}
+                        type="button"
+                        variant={submitOpacity === option.opacity ? "default" : "outline"}
+                        onClick={() => setSubmitOpacity(option.opacity)}
+                        disabled={isLoading}
+                      >
+                        Submit Report {option.label}
+                      </Button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Choose the report intensity before downloading. 100% keeps the original appearance.</p>
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Processing..." : "Submit Report"}
+                    {isLoading ? "Processing..." : `Generate ${Math.round(submitOpacity * 100)}% Report`}
                   </Button>
                 </form>
               </CardContent>
