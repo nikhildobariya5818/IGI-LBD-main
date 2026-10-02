@@ -28,6 +28,7 @@ interface EditorState {
   pdfName: string
   fileName: string
   useGradingScales: boolean
+  opacity: number
 }
 
 const SECTION_OPTIONS = [
@@ -102,6 +103,7 @@ export default function PDFEditorPage() {
   // Once any section is moved, we initialize layout FROM the InvoicePDF defaults so
   // untouched sections stay exactly where they were.
   const [layout, setLayout] = useState<PDFLayout | undefined>(undefined)
+  const [opacity, setOpacity] = useState(1)
 
   useEffect(() => {
     try {
@@ -111,6 +113,9 @@ export default function PDFEditorPage() {
       const fileName = searchParams.get('fileName') || 'report.pdf'
       const useGradingScalesStr = searchParams.get('useGradingScales') || 'false'
       const useGradingScales = useGradingScalesStr === 'true'
+      const opacityValue = Number(searchParams.get('opacity'))
+      const reportOpacity = Number.isFinite(opacityValue) && opacityValue > 0 && opacityValue <= 1 ? opacityValue : 1
+      setOpacity(reportOpacity)
 
       if (dataStr) {
         const parsedData = JSON.parse(decodeURIComponent(dataStr))
@@ -120,6 +125,7 @@ export default function PDFEditorPage() {
           pdfName,
           fileName,
           useGradingScales,
+          opacity: reportOpacity,
         })
         setLayout(undefined)
       }
@@ -234,7 +240,7 @@ const handleArrowMove = useCallback(
     try {
       const PDFComponent = editorState.useGradingScales ? InvoicePDFGradingScales : InvoicePDF
       const blob = await pdf(
-        <PDFComponent data={editorState.data} size={editorState.size} layout={layout} />
+        <PDFComponent data={editorState.data} size={editorState.size} layout={layout} opacity={opacity} />
       ).toBlob()
 
       const url = URL.createObjectURL(blob)
@@ -524,15 +530,17 @@ const handleArrowMove = useCallback(
                 data={editorState.data}
                 size={editorState.size}
                 layout={layout}
-                activeSection={selectedSection}
-              />
+  activeSection={selectedSection}
+  opacity={opacity}
+  />
             ) : (
               <InvoicePDF
                 data={editorState.data}
                 size={editorState.size}
                 layout={layout}
-                activeSection={selectedSection}
-              />
+  activeSection={selectedSection}
+  opacity={opacity}
+  />
             )}
           </PDFViewer>
         </div>

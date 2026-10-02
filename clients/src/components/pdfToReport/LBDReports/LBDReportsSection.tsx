@@ -46,6 +46,14 @@ interface LBDResponse {
 
 export default function LBDReportsSection() {
   const [clientName, setClientName] = useState("")
+  const [submitOpacity, setSubmitOpacity] = useState(1)
+
+  const submitOptions = [
+    { label: "25%", opacity: 0.25 },
+    { label: "50%", opacity: 0.5 },
+    { label: "75%", opacity: 0.75 },
+    { label: "100%", opacity: 1 },
+  ]
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingProgress, setLoadingProgress] = useState(0)
@@ -163,10 +171,11 @@ export default function LBDReportsSection() {
       // inside an extra <Document> produces a corrupt, page-less PDF that
       // Acrobat refuses to open. Use IGIReportPDF only for on-screen preview.
       const blob = await pdf(
-        <IGIReportContent
-          data={mergedData}
-          backgroundImage="/igi-report-template.jpg"
-        />
+          <IGIReportContent
+            data={mergedData}
+            backgroundImage="/igi-report-template.jpg"
+            opacity={submitOpacity}
+          />
       ).toBlob()
 
       setLoadingProgress(95)
@@ -302,8 +311,20 @@ export default function LBDReportsSection() {
               )}
             </div>
 
-            {/* Submit Button */}
-            <Button
+          <div className="space-y-2 rounded-lg border border-border bg-accent/30 p-4">
+            <p className="text-sm font-medium">Submit report intensity</p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {submitOptions.map((option) => (
+                <Button key={option.label} type="button" variant={submitOpacity === option.opacity ? "default" : "outline"} onClick={() => setSubmitOpacity(option.opacity)} disabled={isLoading}>
+                  Submit Report {option.label}
+                </Button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">100% keeps the original appearance.</p>
+          </div>
+
+          {/* Submit Button */}
+          <Button
               type="submit"
               className="w-full"
               disabled={!isFormComplete || isLoading}
