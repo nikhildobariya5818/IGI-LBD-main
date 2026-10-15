@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Upload, X } from "lucide-react"
 import { pdf } from "@react-pdf/renderer"
 import InvoicePDFMini from "./InvoicePDFMini"
+import CenterReportPDF from "./CenterReportPDF"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog"
 import { Label } from "../../ui/label"
@@ -61,6 +62,8 @@ interface UploadMiniReportsResponse {
 
 export default function MiniReportsSection() {
   const [pdfName, setPdfName] = useState("")
+  const [reportType, setReportType] = useState<"mini" | "center">("mini")
+  const [centerImage, setCenterImage] = useState<File | null>(null)
   const [submitOpacity, setSubmitOpacity] = useState(1)
 
   const submitOptions = [
@@ -85,6 +88,61 @@ export default function MiniReportsSection() {
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const handleCenterImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file")
+      return
+    }
+    setCenterImage(file)
+    toast.success("Center report image selected")
+  }
+
+  const handleCenterReport = async () => {
+    if (uploadedFiles.length !== 1 || !centerImage) {
+      toast.error("Upload one PDF and one report image")
+      return
+    }
+
+    setIsLoading(true)
+    setLoadingStatus("uploading")
+    setLoadingProgress(20)
+    try {
+      await apiClient.uploadMiniReports(uploadedFiles, { locationData })
+      setLoadingStatus("generating")
+      setLoadingProgress(70)
+      const imageSrc = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(String(reader.result))
+        reader.onerror = reject
+        reader.readAsDataURL(centerImage)
+      })
+      const blob = await pdf(<CenterReportPDF imageSrc={imageSrc} opacity={submitOpacity} />).toBlob()
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `${pdfName.trim() || "Center_Report"}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+      setLoadingStatus("complete")
+      setLoadingProgress(100)
+      toast.success("Center report downloaded successfully")
+    } catch (error) {
+      console.error("[v0] Error generating center report:", error)
+      toast.error("Failed to generate center report")
+    } finally {
+      setIsLoading(false)
+      setLoadingStatus("idle")
+      setLoadingProgress(0)
+      setUploadedFiles([])
+      setCenterImage(null)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+    }
+  }
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
     const pdfFiles = files.filter((f) => f.type === "application/pdf")
@@ -101,9 +159,9 @@ export default function MiniReportsSection() {
 
     setUploadedFiles(pdfFiles)
 
-    if (pdfFiles.length === 1) {
+    if (reportType === "mini" && pdfFiles.length === 1) {
       setShowPositionDialog(true)
-    } else if (pdfFiles.length === 2) {
+    } else if (reportType === "mini" && pdfFiles.length === 2) {
       handleProcessPdfs(pdfFiles, "dual")
     }
   }
@@ -257,11 +315,19 @@ export default function MiniReportsSection() {
         <CardHeader>
           <CardTitle>Mini Reports PDF Generator</CardTitle>
           <CardDescription>
-            Upload 1-2 PDF documents. Single PDF: select position (top/bottom). Dual PDFs: auto download.
+            Create a two-up mini report or a centered report from one PDF and one uploaded report image.
           </CardDescription>
         </CardHeader>
 
           <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-2 rounded-lg border border-border bg-accent/30 p-2">
+              <Button type="button" variant={reportType === "mini" ? "default" : "outline"} onClick={() => setReportType("mini")}>
+                Mini Report
+              </Button>
+              <Button type="button" variant={reportType === "center" ? "default" : "outline"} onClick={() => setReportType("center")}>
+                Center Report
+              </Button>
+            </div>
             <div className="space-y-2 rounded-lg border border-border bg-accent/30 p-4">
               <p className="text-sm font-medium">Submit report intensity</p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -348,7 +414,7 @@ export default function MiniReportsSection() {
               ref={fileInputRef}
               type="file"
               accept=".pdf"
-              multiple
+              multiple={reportType === "mini"}
               onChange={handleFileChange}
               className="hidden"
               id="pdf-upload"
@@ -356,13 +422,22 @@ export default function MiniReportsSection() {
             />
             <Label htmlFor="pdf-upload" className="cursor-pointer flex flex-col items-center gap-2">
               <Upload className="h-8 w-8 text-muted-foreground" />
-              <span className="text-sm font-medium">Click to upload PDF (1-2 files)</span>
+              <span className="text-sm font-medium">Click to upload PDF ({reportType === "center" ? "1 file" : "1-2 files"})</span>
               <span className="text-xs text-muted-foreground">PDF files only</span>
             </Label>
           </div>
 
           {!isLocationComplete && (
             <p className="text-xs text-destructive">Please fill in all location fields before uploading</p>
+          )}
+
+          {reportType === "center" && (
+            <div className="space-y-2 rounded-lg border border-dashed border-border p-4">
+              <Label htmlFor="center-image">Center report image</Label>
+              <Input id="center-image" type="file" accept="image/*" onChange={handleCenterImageChange} disabled={isLoading || isGenerating} />
+              <p className="text-xs text-muted-foreground">Upload the report image to place in the center of the generated page.</p>
+              {centerImage && <p className="text-xs text-primary">Selected: {centerImage.name}</p>}
+            </div>
           )}
 
           {uploadedFiles.length > 0 && (
@@ -389,7 +464,13 @@ export default function MiniReportsSection() {
             </div>
           )}
 
-          {uploadedFiles.length === 1 && !showPositionDialog && (
+          {reportType === "center" && uploadedFiles.length === 1 && (
+            <Button onClick={handleCenterReport} className="w-full" disabled={isLoading || isGenerating || !centerImage}>
+              {isLoading || isGenerating ? "Processing..." : "Generate Center Report"}
+            </Button>
+          )}
+
+          {reportType === "mini" && uploadedFiles.length === 1 && !showPositionDialog && (
             <Button onClick={() => setShowPositionDialog(true)} className="w-full" disabled={isLoading || isGenerating}>
               {isLoading || isGenerating ? "Processing..." : "Select Position"}
             </Button>
