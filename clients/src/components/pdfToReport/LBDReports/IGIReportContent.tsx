@@ -11,7 +11,7 @@ export const LBD_PDF_PAGE_HEIGHT = 612
 
 /** The image extractor splits the source report into these four vertical panels. */
 const PANELS = [
-  { key: "page1", left: 0, width: 0.248 },
+  { key: "page1", left: 0, width: 0.245 },
   { key: "page2", left: 0.248, width: 0.253 },
   { key: "page3", left: 0.501, width: 0.293 },
   { key: "page4", left: 0.794, width: 0.206 },

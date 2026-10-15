@@ -9,7 +9,7 @@ import InvoicePDFSectionMini4 from "./InvoicePDFSectionMini4"
 const styles = StyleSheet.create({
   block: {
     position: "absolute",
-    left: 8,  //0
+    left: 6,  //0
     width: 1224,
     height: 396,
   },
@@ -27,6 +27,34 @@ const styles = StyleSheet.create({
     letterSpacing: 0.80,
     color: "#000",
   },
+  // giatextContainer: {
+  //   width: "100%",
+  //   textAlign: "center",
+  //   // paddingBottom: "10px",
+  //   left: 36,
+  // },
+// verifytextContainer: {
+//     width: "100%",
+//     textAlign: "center",
+//     // paddingBottom: "10px",
+//     left: 36,
+//   },
+//   verifytitleText: {
+//     fontFamily: baseFont,
+//     fontSize: 7,
+//     letterSpacing: -0.60,
+//     color: "#A39150",
+//     // top: 0
+//   },
+
+//   giatitleText: {
+//     fontFamily: baseFont,
+//     fontSize: 7,
+//     letterSpacing: -0.80,
+//     color: "#A39150",
+//     top:24,
+//     transform: "scaleY(1.4)",
+//   },
 
   section1: {
     position: "absolute",
@@ -58,7 +86,7 @@ const styles = StyleSheet.create({
 
   section4: {
     position: "absolute",
-    left: 790,
+    left: 788,
     top: 40,
     width: 98,
     overflow: "hidden",
@@ -75,9 +103,12 @@ export default function MiniReportBlock({
 }) {
   return (
     <View style={[styles.block, { top }]}>
+
+
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>{report.GIANATURALDIAMONDGRADINGREPORT?.GIAReportNumber}</Text>
       </View>
+
 
       {/* Section 1: Left Text Details */}
       <View style={styles.section1}>

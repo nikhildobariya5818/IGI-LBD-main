@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
 
   barcodeNumber: {
     fontFamily: baseFont,
-    fontSize: 7,
+    fontSize: 8,
     right: 25,
     bottom: 2.5,
     letterSpacing: 0.10
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
 
   barcode10Text: {
     fontFamily: "OCR",
-    fontSize: 7,
+    fontSize: 8,
     marginLeft: 3,
   },
 })

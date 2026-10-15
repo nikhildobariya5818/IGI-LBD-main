@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   barcodeNumber: {
     marginLeft: 5.5,
     bottom: 1,
-    fontSize: "7",
+    fontSize: "8",
     fontFamily: "OCR",
     color: "#000",
 

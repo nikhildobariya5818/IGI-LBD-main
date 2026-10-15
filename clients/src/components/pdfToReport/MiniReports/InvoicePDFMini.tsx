@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     width: PAGE_WIDTH,
     height: PAGE_HEIGHT,
     zIndex: -1,
-    backgroundColor:"red"
+    // backgroundColor:"red"
   },
 })
 
@@ -52,7 +52,11 @@ export default function InvoicePDFMini({ reports, opacity = 1 }: { reports?: any
     <Document>
       <Page size={[PAGE_WIDTH, PAGE_HEIGHT]} style={[styles.page, { opacity } ]}>
         {/* Background */}
-        
+          <Image
+    src="clients\public\GIA-REPORT-name.jpg"
+    style={styles.background}
+  />
+
 
         {/* TOP REPORT */}
         {finalReports[0] && <MiniReportBlock report={finalReports[0]} top={0} />}
